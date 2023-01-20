@@ -43,6 +43,10 @@ const users = {
     ]
  }
 
+ // allows backend to respond to calls coming from a different origin
+const cors = require('cors');
+app.use(cors());
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
