@@ -15,10 +15,15 @@ function MyApp() {
   }, [] );
 
   function removeOneCharacter (index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index
+    const person = characters[index];
+    makeDeleteCall(person).then( result => {
+      if (result && result.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index
+        });
+        setCharacters(updated);
+      }
     });
-    setCharacters(updated);
   }
 
   function updateList(person) {
@@ -48,6 +53,18 @@ function MyApp() {
       return response;
     }
     catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  async function makeDeleteCall(person){
+    try {
+      const response = await axios.delete('http://localhost:5000/users/' + person._id);
+      return response;
+    }
+    catch (error) {
+      // we're not handling errors. Just logging into the console
       console.log(error);
       return false;
     }
