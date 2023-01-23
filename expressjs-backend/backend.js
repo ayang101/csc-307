@@ -35,11 +35,6 @@ const users = {
           name: 'Dennis',
           job: 'Bartender',
        },
-       {
-         "id": "qwe123",
-         "job": "Zookeeper",
-         "name": "Cindy"
-      }
     ]
  }
 
@@ -89,34 +84,33 @@ function findUserById(id) {
    // return users['users_list'].filter( (user) => user['id'] === id);
 }
 
-app.toString('/users', (req, res) => {
+app.post('/users', (req, res) => {
    const userToAdd = req.body;
-   addUser(userToAdd);
-   res.status(200).end();
+   const user = addUser(userToAdd);
+   res.status(201).send(user);
 });
 
 function addUser(user){
+   const rand_id = generateRandomId();
+   user['id'] = rand_id;
    users['users_list'].push(user);
+   return user;
 }
 
 // remove a particular user by id
 app.delete('/users/:id', (req, res) => {
    const id = req.params['id']; // or req.params.id
-   let result = filterOutUserById(id);
-   if (result === undefined || result.length == 0)
+   let result = findUserIndexById(id);
+   if (result == -1)
       res.status(404).send('Resource not found.');
    else {
-      result = {users_list: result};
-      res.send(result);
+      users['users_list'].splice(index, 1);
+      res.status(200).end();
    }
 });
 
-function filterOutUserById(id) {
-   return users['users_list'].filter( (user) => user['id'] != id);
-}
-
 // get all users that match a given name and job
-app.get('/users/:name/:job', (req, res) => {
+app.get('/users', (req, res) => {
    const name = req.params['name']; // or req.params.id
    const job = req.params['job'];
    let result = findUserByNameJob(name, job);
@@ -129,5 +123,15 @@ app.get('/users/:name/:job', (req, res) => {
 });
 
 function findUserByNameJob(name, job) {
-   return users['users_list'].find( (user) => user['name'] === name && user['job'] === job);
+   return users['users_list'].find( ((user) => user['name'] === name) && ((user) => user['job'] === job));
 }
+
+function findUserIndexById(id) {
+   return users['users_list'].findIndex( (user) => user['id'] === id); // or line below
+   // return users['users_list'].filter( (user) => user['id'] === id);
+}
+
+function generateRandomId() {
+   return String(Math.floor(Math.random() * 100000) + 1);
+}
+
