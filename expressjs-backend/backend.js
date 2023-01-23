@@ -84,10 +84,10 @@ function findUserById(id) {
    // return users['users_list'].filter( (user) => user['id'] === id);
 }
 
-app.toString('/users', (req, res) => {
+app.post('/users', (req, res) => {
    const userToAdd = req.body;
-   addUser(userToAdd);
-   res.status(201).end();
+   const user = addUser(userToAdd);
+   res.status(201).send(user).end();
 });
 
 function addUser(user){
@@ -100,18 +100,14 @@ function addUser(user){
 // remove a particular user by id
 app.delete('/users/:id', (req, res) => {
    const id = req.params['id']; // or req.params.id
-   let result = filterOutUserById(id);
-   if (result === undefined || result.length == 0)
+   let result = findUserIndexById(id);
+   if (result === -1)
       res.status(404).send('Resource not found.');
    else {
-      result = {users_list: result};
-      res.send(result);
+      users['users_list'].splice(result, 1);
+      res.status(204).end();
    }
 });
-
-function filterOutUserById(id) {
-   return users['users_list'].filter( (user) => user['id'] != id);
-}
 
 // get all users that match a given name and job
 app.get('/users', (req, res) => {
@@ -128,6 +124,11 @@ app.get('/users', (req, res) => {
 
 function findUserByNameJob(name, job) {
    return users['users_list'].find( ((user) => user['name'] === name) && ((user) => user['job'] === job));
+}
+
+function findUserIndexById(id) {
+   return users['users_list'].findIndex( (user) => user['id'] === id); // or line below
+   // return users['users_list'].filter( (user) => user['id'] === id);
 }
 
 function generateRandomId() {

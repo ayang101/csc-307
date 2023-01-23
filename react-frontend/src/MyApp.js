@@ -15,8 +15,7 @@ function MyApp() {
   }, [] );
 
   function removeOneCharacter (index) {
-    const person = characters[index];
-    makeDeleteCall(person).then( result => {
+    makeDeleteCall(index).then( result => {
       if (result && result.status === 204) {
         const updated = characters.filter((character, i) => {
           return i !== index
@@ -58,9 +57,10 @@ function MyApp() {
     }
   }
 
-  async function makeDeleteCall(person){
+  async function makeDeleteCall(index){
     try {
-      const response = await axios.delete('http://localhost:5000/users/' + person._id);
+      var id = characters[index].id
+      const response = await axios.delete('http://localhost:5000/users/' + id);
       return response;
     }
     catch (error) {
